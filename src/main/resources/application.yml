@@ -20,7 +20,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create #create update none
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    show-sql: true
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 1000 #최적화 옵션
+
+logging.level:
+  org.hibernate.SQL: debug
+#  org.hibernate.type: trace
