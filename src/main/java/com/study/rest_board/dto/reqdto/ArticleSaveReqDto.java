@@ -1,4 +1,4 @@
-package com.study.rest_board.dto.resdto;
+package com.study.rest_board.dto.reqdto;
 
 import com.study.rest_board.entity.Article;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class ArticleSaveReqDto {
 	private String password;
 
 
-	public Article toEntity() {
+	public Article of() {
 		return Article.builder()
 			.subject(this.subject)
 			.content(this.content)
