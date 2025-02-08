@@ -9,13 +9,13 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/rest-board
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
+    url: ${DB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+#  h2:
+#    console:
+#      enabled: true
 
 
   jpa:
@@ -25,6 +25,7 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 1000 #최적화 옵션
+        dialect: org.hibernate.dialect.MySQLDialect
 
 logging.level:
   org.hibernate.SQL: debug
