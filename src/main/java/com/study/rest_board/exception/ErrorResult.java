@@ -1,13 +1,11 @@
-package com.study.rest_board.dto;
+package com.study.rest_board.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 @AllArgsConstructor
-//@Data
 @Getter
-public class ErrorResDto {
+public class ErrorResult {
 	private String code;
 	private String message;
 }

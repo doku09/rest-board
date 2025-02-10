@@ -1,6 +1,5 @@
 package com.study.rest_board.entity;
 
-import com.study.rest_board.dto.resdto.ArticleResDto;
 import com.study.rest_board.dto.reqdto.ArticleSaveReqDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,7 +36,7 @@ public class Article {
 		this.password = reqDto.getPassword();
 	}
 
-	public boolean checkWriter(String writerName,String password) {
-		return this.writerName.equals(writerName) && this.password.equals(password);
+	public boolean checkPassword(String password) {
+		return this.password.equals(password);
 	}
 }

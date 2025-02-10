@@ -16,7 +16,7 @@ public class ArticleResDto {
 	private String subject;
 	private String content;
 	private String writerName;
-	private LocalDateTime regDt;
+	private String regDt;
 	private String password;
 
 	public static ArticleResDto from(Article article) {
@@ -24,7 +24,7 @@ public class ArticleResDto {
 			.id(article.getId())
 			.subject(article.getSubject())
 			.content(article.getContent())
-			.regDt(article.getRegDt())
+			.regDt(article.getRegDt().toString())
 			.writerName(article.getWriterName())
 			.password(article.getPassword())
 			.build();

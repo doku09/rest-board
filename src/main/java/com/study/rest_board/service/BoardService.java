@@ -1,14 +1,18 @@
 package com.study.rest_board.service;
 
-import com.study.rest_board.dto.ErrorResDto;
+import com.study.rest_board.dto.reqdto.PasswordReqDto;
 import com.study.rest_board.dto.resdto.ArticleResDto;
 import com.study.rest_board.dto.reqdto.ArticleSaveReqDto;
 import com.study.rest_board.entity.Article;
+import com.study.rest_board.exception.ArticleNotFoundException;
+import com.study.rest_board.exception.InvalidPasswordException;
 import com.study.rest_board.repository.BoardRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,19 +28,34 @@ public class BoardService {
 	}
 
 	public ArticleResDto findArticleById(long id) {
-		Article findArticle = boardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
+		Article findArticle = boardRepository.findById(id).orElseThrow(() -> new ArticleNotFoundException("게시글이 존재하지 않습니다."));
 		return ArticleResDto.from(findArticle);
 	}
 
 	@Transactional
 	public ArticleResDto updateArticleById(long id, ArticleSaveReqDto reqDto) {
 
-			Article article = boardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
-			if(article.checkWriter(reqDto.getWriterName(), reqDto.getPassword())){
-				article.update(reqDto);
-			} else {
-				throw new IllegalArgumentException("잘못된 요청입니다.");
-			}
-		return ArticleResDto.from(article);
+		Article article = boardRepository.findById(id).orElseThrow(() -> new ArticleNotFoundException("게시글이 존재하지 않습니다."));
+		if (article.checkPassword(reqDto.getPassword())) {
+			article.update(reqDto);
+			return ArticleResDto.from(article);
+		} else {
+			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+		}
+	}
+
+	public List<ArticleResDto> findAllArticles() {
+		List<Article> articles = boardRepository.findAll();
+		return articles.stream().map(ArticleResDto::from).toList();
+	}
+
+	@Transactional
+	public void deleteArticleById(long id, PasswordReqDto authDto) {
+
+		Article article = boardRepository.findById(id).orElseThrow(() -> new ArticleNotFoundException("게시글이 존재하지 않습니다."));
+		if (!article.checkPassword(authDto.getPassword())) {
+			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+		}
+		boardRepository.deleteById(article.getId());
 	}
 }
