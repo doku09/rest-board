@@ -36,12 +36,12 @@ public class BoardService {
 	public ArticleResDto updateArticleById(long id, ArticleSaveReqDto reqDto) {
 
 		Article article = boardRepository.findById(id).orElseThrow(() -> new ArticleNotFoundException("게시글이 존재하지 않습니다."));
-		if (article.checkPassword(reqDto.getPassword())) {
-			article.update(reqDto);
-			return ArticleResDto.from(article);
-		} else {
+		if (!article.isEqualPassword(reqDto.getPassword())) {
 			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
 		}
+
+		article.update(reqDto);
+		return ArticleResDto.from(article);
 	}
 
 	public List<ArticleResDto> findAllArticles() {
@@ -53,7 +53,7 @@ public class BoardService {
 	public void deleteArticleById(long id, PasswordReqDto authDto) {
 
 		Article article = boardRepository.findById(id).orElseThrow(() -> new ArticleNotFoundException("게시글이 존재하지 않습니다."));
-		if (!article.checkPassword(authDto.getPassword())) {
+		if (!article.isEqualPassword(authDto.getPassword())) {
 			throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
 		}
 		boardRepository.deleteById(article.getId());

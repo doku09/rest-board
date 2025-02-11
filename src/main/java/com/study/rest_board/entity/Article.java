@@ -36,7 +36,7 @@ public class Article {
 		this.password = reqDto.getPassword();
 	}
 
-	public boolean checkPassword(String password) {
+	public boolean isEqualPassword(String password) {
 		return this.password.equals(password);
 	}
 }
