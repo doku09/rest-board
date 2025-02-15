@@ -1,4 +1,4 @@
-package com.study.rest_board.exception;
+package com.study.rest_board.article.exception;
 
 public class ArticleNotFoundException extends RuntimeException{
 	public ArticleNotFoundException() {

@@ -1,4 +1,4 @@
-package com.study.rest_board.dto.reqdto;
+package com.study.rest_board.article.dto.reqdto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

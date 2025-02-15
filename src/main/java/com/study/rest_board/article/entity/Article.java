@@ -1,6 +1,6 @@
-package com.study.rest_board.entity;
+package com.study.rest_board.article.entity;
 
-import com.study.rest_board.dto.reqdto.ArticleSaveReqDto;
+import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

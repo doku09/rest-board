@@ -1,15 +1,14 @@
-package com.study.rest_board.dto.resdto;
+package com.study.rest_board.article.dto.resdto;
 
-import com.study.rest_board.entity.Article;
+import com.study.rest_board.article.entity.Article;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Builder
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class ArticleResDto {
 	private long id;
@@ -27,6 +26,15 @@ public class ArticleResDto {
 			.regDt(article.getRegDt().toString())
 			.writerName(article.getWriterName())
 			.password(article.getPassword())
+			.build();
+	}
+
+	public static ArticleResDto of(long id, String subject, String content, String writerName) {
+		return ArticleResDto.builder()
+			.id(id)
+			.subject(subject)
+			.content(content)
+			.writerName(writerName)
 			.build();
 	}
 }

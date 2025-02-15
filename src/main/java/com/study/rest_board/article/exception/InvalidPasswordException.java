@@ -1,4 +1,4 @@
-package com.study.rest_board.exception;
+package com.study.rest_board.article.exception;
 
 public class InvalidPasswordException extends RuntimeException{
 	public InvalidPasswordException() {

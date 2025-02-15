@@ -1,4 +1,4 @@
-package com.study.rest_board.exception;
+package com.study.rest_board.article.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

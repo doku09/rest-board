@@ -1,13 +1,12 @@
-package com.study.rest_board.service;
+package com.study.rest_board.article.service;
 
-import com.study.rest_board.dto.reqdto.PasswordReqDto;
-import com.study.rest_board.dto.resdto.ArticleResDto;
-import com.study.rest_board.dto.reqdto.ArticleSaveReqDto;
-import com.study.rest_board.entity.Article;
-import com.study.rest_board.exception.ArticleNotFoundException;
-import com.study.rest_board.exception.InvalidPasswordException;
-import com.study.rest_board.repository.BoardRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.resdto.ArticleResDto;
+import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
+import com.study.rest_board.article.entity.Article;
+import com.study.rest_board.article.exception.ArticleNotFoundException;
+import com.study.rest_board.article.exception.InvalidPasswordException;
+import com.study.rest_board.article.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

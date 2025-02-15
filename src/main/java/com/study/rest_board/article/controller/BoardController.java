@@ -1,15 +1,13 @@
-package com.study.rest_board.controller;
+package com.study.rest_board.article.controller;
 
-import com.study.rest_board.dto.reqdto.PasswordReqDto;
-import com.study.rest_board.dto.resdto.ArticleResDto;
-import com.study.rest_board.dto.reqdto.ArticleSaveReqDto;
-import com.study.rest_board.service.BoardService;
+import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.resdto.ArticleResDto;
+import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
+import com.study.rest_board.article.service.BoardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/board")

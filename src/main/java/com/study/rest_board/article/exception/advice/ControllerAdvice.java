@@ -1,9 +1,8 @@
-package com.study.rest_board.exception.advice;
+package com.study.rest_board.article.exception.advice;
 
-import com.study.rest_board.exception.ArticleNotFoundException;
-import com.study.rest_board.exception.ErrorResult;
-import com.study.rest_board.exception.InvalidPasswordException;
-import jakarta.persistence.EntityNotFoundException;
+import com.study.rest_board.article.exception.ArticleNotFoundException;
+import com.study.rest_board.article.exception.ErrorResult;
+import com.study.rest_board.article.exception.InvalidPasswordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
