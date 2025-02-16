@@ -1,5 +1,7 @@
 package com.study.rest_board.config;
 
+import com.study.rest_board.config.jwt.JwtAuthenticationFilter;
+import com.study.rest_board.config.jwt.JwtAuthorizationFilter;
 import com.study.rest_board.user.repository.UserRepositoryJPA;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -33,10 +35,15 @@ public class SecurityConfig {
 		http.formLogin(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(sessionManager -> sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.httpBasic(httpBasic -> httpBasic.disable())
+			.httpBasic(AbstractHttpConfigurer::disable)
 			.addFilter(new JwtAuthenticationFilter(authenticationManager))
-			.authorizeHttpRequests((authorize) -> authorize.anyRequest()
-				.permitAll());
+			.addFilter(new JwtAuthorizationFilter(authenticationManager,userRepository))
+			.authorizeHttpRequests((authz) -> authz
+//				.requestMatchers("/board/**").authenticated()
+				.requestMatchers("/admin/article/**").hasAnyRole("ADMIN")
+//				.requestMatchers("/board/**").hasRole()
+//				.anyRequest().authenticated()
+				.anyRequest().permitAll());
 		return http.build();
 	}
 }
