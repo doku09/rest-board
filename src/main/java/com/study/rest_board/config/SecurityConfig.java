@@ -32,11 +32,17 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain configure(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+
+		JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager);
+
+		// 로그인 경로를 /auth/login으로 변경
+		jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+
 		http.formLogin(AbstractHttpConfigurer::disable)
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement(sessionManager -> sessionManager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.httpBasic(AbstractHttpConfigurer::disable)
-			.addFilter(new JwtAuthenticationFilter(authenticationManager))
+			.addFilter(jwtAuthenticationFilter)
 			.addFilter(new JwtAuthorizationFilter(authenticationManager,userRepository))
 			.authorizeHttpRequests((authz) -> authz
 //				.requestMatchers("/board/**").authenticated()
@@ -44,6 +50,19 @@ public class SecurityConfig {
 //				.requestMatchers("/board/**").hasRole()
 //				.anyRequest().authenticated()
 				.anyRequest().permitAll());
+
+
+		http.addFilter(jwtAuthenticationFilter);
 		return http.build();
 	}
+
+//	public class Custom extends AbstractHttpConfigurer<Custom, HttpSecurity> {
+//		@Override
+//		public void configure(HttpSecurity builder) throws Exception {
+//			AuthenticationManager authenticationmanager = builder.getSharedObject(AuthenticationManager.class);
+//			JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationmanager);
+//			jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+//			builder.addFilter(jwtAuthenticationFilter);
+//		}
+//	}
 }

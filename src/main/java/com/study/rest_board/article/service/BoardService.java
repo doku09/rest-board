@@ -3,7 +3,7 @@ package com.study.rest_board.article.service;
 import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
 import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
-import com.study.rest_board.article.entity.Article;
+import com.study.rest_board.article.domain.Article;
 import com.study.rest_board.article.exception.ArticleNotFoundException;
 import com.study.rest_board.article.exception.InvalidPasswordException;
 import com.study.rest_board.article.repository.BoardRepository;

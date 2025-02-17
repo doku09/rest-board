@@ -1,16 +1,17 @@
 package com.study.rest_board.service;
 
-import com.study.rest_board.dto.reqdto.PasswordReqDto;
-import com.study.rest_board.dto.resdto.ArticleResDto;
-import com.study.rest_board.dto.reqdto.ArticleSaveReqDto;
-import com.study.rest_board.entity.Article;
-import com.study.rest_board.exception.ArticleNotFoundException;
-import com.study.rest_board.exception.InvalidPasswordException;
-import com.study.rest_board.repository.BoardRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.resdto.ArticleResDto;
+import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
+import com.study.rest_board.article.domain.Article;
+import com.study.rest_board.article.exception.ArticleNotFoundException;
+import com.study.rest_board.article.exception.InvalidPasswordException;
+import com.study.rest_board.article.repository.BoardRepository;
+import com.study.rest_board.article.service.BoardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -26,10 +27,15 @@ class BoardServiceTest {
 
 	@Autowired
 	private BoardService boardService;
-	@Autowired
-	private BoardRepository boardRepository;
+//	@Autowired
+//	private BoardRepository boardRepository;
+
+	@Mock
+	BoardRepository boardRepository;
+
 	@Autowired
 	private DataSource dataSource;
+
 
 	@BeforeEach
 	void setup() {
@@ -64,7 +70,8 @@ class BoardServiceTest {
 		ArticleResDto articleResDto = boardService.saveArticle(reqDto);
 
 		//then
-		Article article = boardRepository.findById(articleResDto.getId()).orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
+		Article article = boardRepository.findById(articleResDto.getId()).orElseThrow(() -> new ArticleNotFoundException("게시글이 존재하지 않습니다."));
+//		when(boardRepository.findById(2L)).thenReturn(Optional.of(new Article()));
 		assertThat(articleResDto.getId()).isEqualTo(article.getId());
 		assertThat("작성 테스트").isEqualTo(article.getSubject());
 		assertThat("내용입니다").isEqualTo(article.getContent());

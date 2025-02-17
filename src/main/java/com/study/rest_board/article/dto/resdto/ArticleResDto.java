@@ -1,6 +1,6 @@
 package com.study.rest_board.article.dto.resdto;
 
-import com.study.rest_board.article.entity.Article;
+import com.study.rest_board.article.domain.Article;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

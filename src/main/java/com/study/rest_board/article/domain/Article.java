@@ -1,4 +1,4 @@
-package com.study.rest_board.article.entity;
+package com.study.rest_board.article.domain;
 
 import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
 import jakarta.persistence.Entity;
