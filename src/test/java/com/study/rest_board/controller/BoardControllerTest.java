@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(BoardController.class)
 @WithMockUser("user1")
-
 class BoardControllerTest {
 
 	@Autowired

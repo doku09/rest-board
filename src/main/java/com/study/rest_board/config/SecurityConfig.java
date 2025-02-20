@@ -45,7 +45,7 @@ public class SecurityConfig {
 			.addFilter(jwtAuthenticationFilter)
 			.addFilter(new JwtAuthorizationFilter(authenticationManager,userRepository))
 			.authorizeHttpRequests((authz) -> authz
-//				.requestMatchers("/board/**").authenticated()
+				.requestMatchers("/board/**").authenticated()
 				.requestMatchers("/admin/article/**").hasAnyRole("ADMIN")
 //				.requestMatchers("/board/**").hasRole()
 //				.anyRequest().authenticated()

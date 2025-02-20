@@ -8,63 +8,61 @@ import com.study.rest_board.user.dto.request.UserJoinRequestDto;
 import com.study.rest_board.user.dto.request.UserLoginRequestDto;
 import com.study.rest_board.user.repository.UserRepositoryJPA;
 import com.study.rest_board.user.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.*;
+import java.util.stream.Stream;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//@WebMvcTest(UserController.class)
+@WebMvcTest(UserController.class)
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@TestPropertySource(properties = {"spring.config.location = classpath:application-test.yml"})
-@AutoConfigureMockMvc
-//@WithMockUser(username = "test11",password = "abc1234", roles = "USER")
+@TestPropertySource(properties = {"spring.config.location = classpath:application-test.yml"})
+@WithMockUser(username = "test11", password = "abc1234", roles = "USER")
 class UserControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Mock
+	@MockitoBean
 	private UserService userService;
+
 	@Mock
 	private UserRepositoryJPA userRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
 	@Mock
 	private JwtUtil jwtUtil;
 
-	@BeforeEach
-	void 아이디_생성() {
-		System.out.println("UserControllerTest.아이디_생성");
-		UserJoinRequestDto requestDto = new UserJoinRequestDto("test11", "abc1234!", UserRole.ROLE_USER);
 
-		userRepository.save(requestDto.toEntity());
-	}
-
-	@Test
-	@DisplayName("회원가입을 테스트한다.")
-	void 회원가입() throws Exception {
+	@DisplayName("정상적으로 회원가입을 완료한다.")
+	@ParameterizedTest()
+	@MethodSource("usernameAndPassword")
+	void 회원가입_완료(String username, String password) throws Exception {
 
 		//given
-		UserJoinRequestDto requestDto = new UserJoinRequestDto("dong", "abc1234!", UserRole.ROLE_USER);
+		UserJoinRequestDto requestDto = new UserJoinRequestDto(username, password, UserRole.ROLE_USER);
 
 		//when then
 		mockMvc.perform(post("/auth/join")
@@ -96,7 +94,7 @@ class UserControllerTest {
 
 	@Test
 	@DisplayName("정상적인 로그인 요청 시 JWT를 발급한다.")
-	@WithMockUser(username = "test11", roles = "USER") // Mock 사용자 추가
+	@WithMockUser(username = "test11", roles = "USER")
 	void 로그인_성공() throws Exception {
 		System.out.println("UserControllerTest.로그인_성공");
 		//given
@@ -106,7 +104,6 @@ class UserControllerTest {
 		when(jwtUtil.generateToken(any(User.class))).thenReturn(fakeJwt);
 
 		//when then
-
 		mockMvc.perform(post("/auth/login")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestDto))
@@ -116,4 +113,13 @@ class UserControllerTest {
 			.andExpect(header().exists("Authorization")) // JWT 헤더 존재 여부 확인
 			.andExpect(header().string("Authorization", fakeJwt)); // 반환된 JWT 확인
 	}
+
+	static Stream<Arguments> usernameAndPassword() {
+		return Stream.of(
+			Arguments.arguments("abc", "Aautorizen123!"),
+			Arguments.arguments("abc!!", "abc1234"),
+			Arguments.arguments("abc1234", "abc1234!")
+		);
+	}
+
 }

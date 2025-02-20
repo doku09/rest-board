@@ -150,9 +150,9 @@ class BoardServiceTest {
 		//given
 		Article article = new Article(1, "작성 테스트", "내용입니다", "초롱이", LocalDateTime.now(), "abc1234");
 		PasswordReqDto passwordReqDto = new PasswordReqDto("abc1234");
+
 		when(boardRepository.findById(1L)).thenReturn(Optional.of(article));
-		doNothing().when(boardRepository).deleteById(1L);
-//		when(boardRepository.findById(1L)).thenReturn(Optional.empty());
+
 		//when
 		boardService.deleteArticleById(1L, passwordReqDto);
 

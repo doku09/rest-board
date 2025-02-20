@@ -22,7 +22,7 @@ public class BoardService {
 
 	@Transactional
 	public ArticleResDto saveArticle(ArticleSaveReqDto reqDto) {
-		Article savedArticle = boardRepository.save(reqDto.of());
+		Article savedArticle = boardRepository.save(reqDto.toEntity());
 		return ArticleResDto.from(savedArticle);
 	}
 
