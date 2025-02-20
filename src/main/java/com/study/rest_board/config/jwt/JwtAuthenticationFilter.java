@@ -35,8 +35,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			// PrincipalDetailsService의 loadUserByUsername() 함수가 실행된 후 정상이면 authentication이 리턴됨.
 			// DB에 있는  username과 password가 일치한다.
 			Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-			//session 영역에 저장
-			PrincipalDetails principalDetails = (PrincipalDetails) authenticate.getPrincipal();
 
 			return authenticate;
 		} catch (IOException e) {
@@ -56,6 +54,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			.withClaim("username", principalDetails.getUser().getUsername())
 			.sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
+
+		//유저정보 반환
 		response.addHeader(JwtProperties.HEADER_STRING,JwtProperties.TOKEN_PREFIX+jwtToken);
 	}
 }

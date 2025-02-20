@@ -28,7 +28,7 @@ public class ArticleSaveReqDto {
 			.build();
 	}
 
-	public Article of() {
+	public Article toEntity() {
 		return Article.builder()
 			.subject(this.subject)
 			.content(this.content)
