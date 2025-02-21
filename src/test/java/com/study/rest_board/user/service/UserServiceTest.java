@@ -3,17 +3,14 @@ package com.study.rest_board.user.service;
 import com.study.rest_board.common.UserRole;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.dto.request.UserJoinRequestDto;
-import com.study.rest_board.user.repository.UserRepositoryJPA;
+import com.study.rest_board.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
 
@@ -28,7 +25,7 @@ class UserServiceTest {
 	private UserService userService;
 
 	@Mock
-	private UserRepositoryJPA userRepository;
+	private UserRepository userRepository;
 
 	@Mock
 	private BCryptPasswordEncoder bCryptPasswordEncoder; // Mock으로 대체

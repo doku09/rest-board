@@ -4,7 +4,7 @@ import com.study.rest_board.common.UserRole;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.dto.request.UserJoinRequestDto;
 import com.study.rest_board.user.exception.UsernameAlreadyExistsException;
-import com.study.rest_board.user.repository.UserRepositoryJPA;
+import com.study.rest_board.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-	private final UserRepositoryJPA userRepository;
+	private final UserRepository userRepository;
 
 	/**
 	 * 사용자 회원가입

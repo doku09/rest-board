@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.study.rest_board.user.auth.PrincipalDetails;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.exception.NotFoundUserEntityException;
-import com.study.rest_board.user.repository.UserRepositoryJPA;
+import com.study.rest_board.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +20,9 @@ import java.io.IOException;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-	private UserRepositoryJPA userRepository;
+	private UserRepository userRepository;
 
-	public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepositoryJPA userRepository) {
+	public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
 		super(authenticationManager);
 		this.userRepository = userRepository;
 	}

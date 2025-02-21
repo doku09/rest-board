@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
+@Entity
 public class Article {
 
 	@Id

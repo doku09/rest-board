@@ -1,4 +1,4 @@
-package com.study.rest_board.service;
+package com.study.rest_board.article.service;
 
 import com.study.rest_board.article.domain.Article;
 import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
@@ -7,7 +7,6 @@ import com.study.rest_board.article.dto.resdto.ArticleResDto;
 import com.study.rest_board.article.exception.ArticleNotFoundException;
 import com.study.rest_board.article.exception.InvalidPasswordException;
 import com.study.rest_board.article.repository.BoardRepository;
-import com.study.rest_board.article.service.BoardService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
