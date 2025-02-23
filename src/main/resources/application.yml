@@ -1,32 +1,4 @@
-server:
-  port: 8080
-  servlet:
-    context-path: /
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-
 spring:
-  datasource:
-    url: ${DB_URL}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-#  h2:
-#    console:
-#      enabled: true
+  profiles:
+    active: dev
 
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 1000 #최적화 옵션
-        dialect: org.hibernate.dialect.MySQLDialect
-
-logging.level:
-  org.hibernate.SQL: debug
-#  org.hibernate.type: trace
