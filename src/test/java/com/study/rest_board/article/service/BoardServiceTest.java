@@ -1,12 +1,19 @@
 package com.study.rest_board.article.service;
 
 import com.study.rest_board.article.domain.Article;
+import com.study.rest_board.article.domain.ArticleComment;
+import com.study.rest_board.article.dto.reqdto.ArticleCommentSaveReqDto;
 import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
 import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
 import com.study.rest_board.article.exception.ArticleNotFoundException;
 import com.study.rest_board.article.exception.InvalidPasswordException;
 import com.study.rest_board.article.repository.BoardRepository;
+import com.study.rest_board.article.repository.CommentRepository;
+import com.study.rest_board.user.domain.User;
+import com.study.rest_board.user.repository.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +33,15 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(properties = {"spring.config.location = classpath:application-test.yml"})
-class BoardServiceTest {
+class
+BoardServiceTest {
 
 	@Mock
 	BoardRepository boardRepository;
+	@Mock
+	UserRepository userRepository;
+	@Mock
+	CommentRepository commentRepository;
 	@InjectMocks
 	private BoardService boardService;
 
@@ -159,6 +171,34 @@ class BoardServiceTest {
 		verify(boardRepository).deleteById(1L); // deleteById가 호출되었는지 확인
 		when(boardRepository.findById(1L)).thenReturn(Optional.empty()); // 삭제 후 Optional.empty()를 반환하도록 mock 설정
 		assertThat(boardRepository.findById(1L)).isEmpty();  // 삭제 후 존재하지 않아야 함
+	}
+
+	@Test
+	@DisplayName("게시글 댓글을 작성한다")
+	void 댓글_작성() {
+
+	  //given
+		ArticleCommentSaveReqDto reqDto = new ArticleCommentSaveReqDto("content", 1L, 1L);
+
+		long articleId = 1L;
+		when(boardRepository.findById(articleId)).thenReturn(Optional.of(new Article(1L,"subject","content",null,null,null)));
+
+		long userId = 1L;
+		when(userRepository.findById(userId)).thenReturn(Optional.of(new User(1L,"dong",null,null)));
+
+		ArticleComment articleComment = new ArticleComment(1L,"comment content",null,null);
+		when(commentRepository.save(any(ArticleComment.class)))
+			.thenReturn(articleComment);
+
+		//when
+		ArticleCommentResDto result = boardService.saveComment(reqDto);
+
+		//then
+		Assertions.assertThat(result.getContent()).isEqualTo("comment content");
+
+		verify(boardRepository).findById(articleId);  // boardRepository가 호출되었는지 검증
+		verify(userRepository).findById(userId);  // userRepository가 호출되었는지 검증
+		verify(commentRepository).save(any(ArticleComment.class));  // commentRepository가 호출되었는지 검증
 	}
 
 }
