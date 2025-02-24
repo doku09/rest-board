@@ -1,4 +1,4 @@
-package com.study.rest_board.user.auth;
+package com.study.rest_board.common.jwt.auth;
 
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.exception.NotFoundUserEntityException;

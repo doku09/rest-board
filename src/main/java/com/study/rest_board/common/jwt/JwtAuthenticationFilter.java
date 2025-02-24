@@ -1,10 +1,11 @@
-package com.study.rest_board.config.jwt;
+package com.study.rest_board.common.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.rest_board.user.auth.PrincipalDetails;
+import com.study.rest_board.common.jwt.auth.PrincipalDetails;
 import com.study.rest_board.user.domain.User;
+import com.study.rest_board.user.dto.response.UserResDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.util.Date;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	private final AuthenticationManager authenticationManager;
+
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -48,14 +50,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
-		String jwtToken = JWT.create()
-			.withSubject(principalDetails.getUsername())
-			.withExpiresAt(new Date(System.currentTimeMillis() + (JwtProperties.EXPIRATION_TIME)))
-			.withClaim("username", principalDetails.getUser().getUsername())
-			.sign(Algorithm.HMAC512(JwtProperties.SECRET));
+		JwtTokenProvider jwtProvider = new JwtTokenProvider();
+		String jwtToken = jwtProvider.generateToken(principalDetails);
 
+		ObjectMapper objectMapper = new ObjectMapper();
 
 		//유저정보 반환
 		response.addHeader(JwtProperties.HEADER_STRING,JwtProperties.TOKEN_PREFIX+jwtToken);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(objectMapper.writeValueAsString(UserResDto.from(principalDetails.getUser())));
 	}
 }

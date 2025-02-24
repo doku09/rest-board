@@ -1,7 +1,6 @@
-package com.study.rest_board.controller;
+package com.study.rest_board.article.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.rest_board.article.controller.BoardController;
 import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
 import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;

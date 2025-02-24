@@ -1,8 +1,8 @@
-package com.study.rest_board.config;
+package com.study.rest_board.common.config;
 
-import com.study.rest_board.config.jwt.JwtAuthenticationFilter;
-import com.study.rest_board.config.jwt.JwtAuthorizationFilter;
-import com.study.rest_board.user.repository.UserRepositoryJPA;
+import com.study.rest_board.common.jwt.JwtAuthenticationFilter;
+import com.study.rest_board.common.jwt.JwtAuthorizationFilter;
+import com.study.rest_board.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final UserRepositoryJPA userRepository;
+	private final UserRepository userRepository;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -52,7 +52,7 @@ public class SecurityConfig {
 				.anyRequest().permitAll());
 
 
-		http.addFilter(jwtAuthenticationFilter);
+//		http.addFilter(jwtAuthenticationFilter);
 		return http.build();
 	}
 
