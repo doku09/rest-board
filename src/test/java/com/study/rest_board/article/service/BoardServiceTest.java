@@ -3,6 +3,7 @@ package com.study.rest_board.article.service;
 import com.study.rest_board.article.domain.Article;
 import com.study.rest_board.article.domain.ArticleComment;
 import com.study.rest_board.article.dto.reqdto.ArticleCommentSaveReqDto;
+import com.study.rest_board.article.dto.reqdto.ArticleCommentUpdateReqDto;
 import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
 import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
@@ -199,6 +200,51 @@ BoardServiceTest {
 		verify(boardRepository).findById(articleId);  // boardRepository가 호출되었는지 검증
 		verify(userRepository).findById(userId);  // userRepository가 호출되었는지 검증
 		verify(commentRepository).save(any(ArticleComment.class));  // commentRepository가 호출되었는지 검증
+	}
+	
+	@Test
+	@DisplayName("작성한 게시글을 수정한다")
+	void 게시글_수정_정상() {
+
+	  //given
+		long commentId = 1L;
+
+		ArticleCommentUpdateReqDto updateReqDto = new ArticleCommentUpdateReqDto("updateContent", 1, 1);
+
+		User findUser = new User(1L, "", "", null);
+
+		Article findArticle = new Article(1L, "", "", "", LocalDateTime.now(), "");
+
+		ArticleComment savedComment = new ArticleComment(commentId, "originalContent", findUser, findArticle);
+
+		when(commentRepository.findById(commentId))
+			.thenReturn(Optional.of(savedComment));
+
+		//when
+		ArticleCommentResDto updatedComment = boardService.updateComment(commentId, updateReqDto);
+
+		//then
+		assertThat(updateReqDto.getContent()).isEqualTo(updatedComment.getContent());
+	}
+
+	@Test
+	@DisplayName("작성한 댓글을 삭제한다.")
+	void 댓글_삭제() {
+
+	  //given
+		long commentId = 1L;
+		long userId = 1L;
+		User writer = new User(1L, "dong", "", null);
+		Article article = new Article(1L, "", "", "", LocalDateTime.now(), "");
+		ArticleComment articleComment = new ArticleComment(1L, "delete", writer, article);
+
+		when(commentRepository.findById(commentId)).thenReturn(Optional.of(articleComment));
+
+	  //when
+		String result = boardService.deleteCommentById(commentId, userId);
+
+	  //then
+		assertThat(result).isEqualTo("delete ok");
 	}
 
 }
