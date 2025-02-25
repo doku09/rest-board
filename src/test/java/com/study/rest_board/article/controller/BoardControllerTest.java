@@ -1,11 +1,7 @@
 package com.study.rest_board.article.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentSaveReqDto;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentUpdateReqDto;
-import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
-import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.reqdto.*;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
 import com.study.rest_board.article.service.BoardService;
@@ -128,7 +124,7 @@ class BoardControllerTest {
 		ArticleSaveReqDto requestDto = ArticleSaveReqDto.of("수정된 제목", "수정된 내용", "작성자");
 		ArticleResDto responseDto = ArticleResDto.of(articleId, "수정된 제목", "수정된 내용", "작성자");
 
-		when(boardService.updateArticleById(eq(articleId), any(ArticleSaveReqDto.class)))
+		when(boardService.updateArticleById(eq(articleId), any(ArticleUpdateReqDto.class)))
 			.thenReturn(responseDto);
 
 		// When & Then

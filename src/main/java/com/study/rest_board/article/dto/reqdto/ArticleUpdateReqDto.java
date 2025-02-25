@@ -12,15 +12,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Getter
-public class ArticleSaveReqDto {
+public class ArticleUpdateReqDto {
+	private long id;
 	private String subject;
 	private String content;
 	private String writerName;
 	private LocalDateTime regDt;
 	private String password;
 
-	public static ArticleSaveReqDto of(String subject, String content, String password) {
-		return ArticleSaveReqDto.builder()
+	public static ArticleUpdateReqDto of(String subject, String content, String password) {
+		return ArticleUpdateReqDto.builder()
 			.subject(subject)
 			.content(content)
 			.password(password)

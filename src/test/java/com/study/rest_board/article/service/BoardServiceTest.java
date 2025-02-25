@@ -2,16 +2,12 @@ package com.study.rest_board.article.service;
 
 import com.study.rest_board.article.domain.Article;
 import com.study.rest_board.article.domain.ArticleComment;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentSaveReqDto;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentUpdateReqDto;
-import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
-import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.reqdto.*;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
-import com.study.rest_board.article.exception.ArticleNotFoundException;
-import com.study.rest_board.article.exception.InvalidPasswordException;
 import com.study.rest_board.article.repository.BoardRepository;
 import com.study.rest_board.article.repository.CommentRepository;
+import com.study.rest_board.common.exception.GlobalBusinessException;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -103,7 +99,7 @@ BoardServiceTest {
 		//when
 		//then
 		assertThatThrownBy(() -> boardService.findArticleById(5L))
-			.isInstanceOf(ArticleNotFoundException.class);
+			.isInstanceOf(GlobalBusinessException.class);
 	}
 
 	@Test
@@ -113,7 +109,7 @@ BoardServiceTest {
 		//given
 		Article article = new Article(1, "작성 테스트", "내용입니다", "초롱이", LocalDateTime.now(), "abc1234");
 
-		ArticleSaveReqDto reqDto = ArticleSaveReqDto.builder()
+		ArticleUpdateReqDto reqDto = ArticleUpdateReqDto.builder()
 			.subject("수정입니다.")
 			.content("수정 내용 테스트")
 			.writerName("초롱이")
@@ -138,7 +134,7 @@ BoardServiceTest {
 		//given
 		Article article = mock(Article.class);
 
-		ArticleSaveReqDto reqDto = ArticleSaveReqDto.builder()
+		ArticleUpdateReqDto reqDto = ArticleUpdateReqDto.builder()
 			.subject("수정입니다.")
 			.content("수정 내용 테스트")
 			.writerName("초롱이")
@@ -151,7 +147,7 @@ BoardServiceTest {
 
 		//then
 		assertThatThrownBy(() -> boardService.updateArticleById(1, reqDto))
-			.isInstanceOf(InvalidPasswordException.class)
+			.isInstanceOf(GlobalBusinessException.class)
 			.hasMessage("비밀번호가 일치하지 않습니다.");
 	}
 
