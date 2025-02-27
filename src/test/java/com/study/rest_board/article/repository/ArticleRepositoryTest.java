@@ -15,19 +15,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class BoardRepositoryTest {
+class ArticleRepositoryTest {
 
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
-	private BoardRepository boardRepository;
+	private ArticleRepository articleRepository;
 	@Autowired
 	private CommentRepository commentRepository;
 
@@ -35,7 +34,7 @@ class BoardRepositoryTest {
 	@DisplayName("Repository 의존성이 주입되었는지 확인한다")
 	void 의존성_확인() {
 
-		assertThat(boardRepository).isNotNull();
+		assertThat(articleRepository).isNotNull();
 	}
 
   @Test
@@ -105,7 +104,7 @@ class BoardRepositoryTest {
 		ArticleCommentSaveReqDto reqDto = new ArticleCommentSaveReqDto("comment", 1L, 1L);
 
 		User savedUser = userRepository.save(UserJoinRequestDto.builder().username("").build().toEntity());
-		Article savedArticle = boardRepository.save(ArticleSaveReqDto.of("subejc","","").toEntity());
+		Article savedArticle = articleRepository.save(ArticleSaveReqDto.of("subejc","","").toEntity());
 
 		//when
 		ArticleComment comment = reqDto.toEntity(savedArticle, savedUser);

@@ -1,30 +1,23 @@
 package com.study.rest_board.article.controller;
 
-import com.study.rest_board.article.domain.ArticleComment;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentSaveReqDto;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentUpdateReqDto;
-import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.reqdto.*;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
-import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
-import com.study.rest_board.article.service.BoardService;
+import com.study.rest_board.article.service.ArticleService;
 import com.study.rest_board.common.jwt.auth.PrincipalDetails;
 import com.study.rest_board.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/board")
 @RequiredArgsConstructor
-public class BoardController {
+public class ArticleController {
 
-	private final BoardService boardService;
+	private final ArticleService articleService;
 
 
 
@@ -33,7 +26,7 @@ public class BoardController {
 	 */
 	@GetMapping("/articles")
 	public List<ArticleResDto> findArticles() {
-		return boardService.findAllArticles();
+		return articleService.findAllArticles();
 	}
 
 	/**
@@ -41,7 +34,7 @@ public class BoardController {
 	 */
 	@PostMapping("/article")
 	public ArticleResDto saveArticle(@RequestBody ArticleSaveReqDto reqDto) {
-		return boardService.saveArticle(reqDto);
+		return articleService.saveArticle(reqDto);
 	}
 
 	/**
@@ -49,15 +42,15 @@ public class BoardController {
 	 */
 	@GetMapping("/article/{id}")
 	public ArticleResDto findArticleById(@PathVariable("id") Long id) {
-		return boardService.findArticleById(id);
+		return articleService.findArticleById(id);
 	}
 
 	/**
 	 * 게시글 수정
 	 */
 	@PutMapping("/article/{id}")
-	public ArticleResDto updateArticleById(@PathVariable("id") long id, @RequestBody ArticleSaveReqDto reqDto) {
-		return boardService.updateArticleById(id,reqDto);
+	public ArticleResDto updateArticleById(@PathVariable("id") long id, @RequestBody ArticleUpdateReqDto reqDto) {
+		return articleService.updateArticleById(id,reqDto);
 	}
 
 	/**
@@ -65,7 +58,7 @@ public class BoardController {
 	 */
 	@DeleteMapping("/article/{id}")
 	public String deleteArticleById(@PathVariable("id") long id, @RequestBody PasswordReqDto passwordDto) {
-		boardService.deleteArticleById(id,passwordDto);
+		articleService.deleteArticleById(id,passwordDto);
 		return "ok";
 	}
 
@@ -78,7 +71,7 @@ public class BoardController {
 		User user = principal.getUser();
 		reqDto.setUserId(user.getId());
 
-		return boardService.saveComment(reqDto);
+		return articleService.saveComment(reqDto);
 	}
 
 	/**
@@ -90,7 +83,7 @@ public class BoardController {
 		User user = principal.getUser();
 		reqDto.setUserId(user.getId());
 
-		return boardService.updateComment(id,reqDto);
+		return articleService.updateComment(id,reqDto);
 	}
 
 	/**
@@ -101,7 +94,7 @@ public class BoardController {
 
 		User user = principal.getUser();
 
-		String result = boardService.deleteCommentById(id, user.getId());
+		String result = articleService.deleteCommentById(id, user.getId());
 		return ResponseEntity.ok(result);
 	}
 }

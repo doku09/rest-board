@@ -1,17 +1,12 @@
 package com.study.rest_board.article.service;
 
 import com.study.rest_board.article.domain.ArticleComment;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentSaveReqDto;
-import com.study.rest_board.article.dto.reqdto.ArticleCommentUpdateReqDto;
-import com.study.rest_board.article.dto.reqdto.PasswordReqDto;
+import com.study.rest_board.article.dto.reqdto.*;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
-import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
 import com.study.rest_board.article.domain.Article;
 import com.study.rest_board.article.exception.ArticleErrorCode;
-import com.study.rest_board.article.exception.ArticleNotFoundException;
-import com.study.rest_board.article.exception.InvalidPasswordException;
-import com.study.rest_board.article.repository.BoardRepository;
+import com.study.rest_board.article.repository.ArticleRepository;
 import com.study.rest_board.article.repository.CommentRepository;
 import com.study.rest_board.common.exception.GlobalBusinessException;
 import com.study.rest_board.user.domain.User;
@@ -26,27 +21,27 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BoardService {
+public class ArticleService {
 
-	private final BoardRepository boardRepository;
+	private final ArticleRepository articleRepository;
 	private final CommentRepository commentRepository;
 	private final UserRepository userRepository;
 
 	@Transactional
 	public ArticleResDto saveArticle(ArticleSaveReqDto reqDto) {
-		Article savedArticle = boardRepository.save(reqDto.toEntity());
+		Article savedArticle = articleRepository.save(reqDto.toEntity());
 		return ArticleResDto.from(savedArticle);
 	}
 
 	public ArticleResDto findArticleById(long id) {
-		Article findArticle = boardRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
+		Article findArticle = articleRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
 		return ArticleResDto.from(findArticle);
 	}
 
 	@Transactional
-	public ArticleResDto updateArticleById(long id, ArticleSaveReqDto reqDto) {
+	public ArticleResDto updateArticleById(long id, ArticleUpdateReqDto reqDto) {
 
-		Article article = boardRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
+		Article article = articleRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
 		if (!article.isEqualPassword(reqDto.getPassword())) {
 			throw new GlobalBusinessException(ArticleErrorCode.INVALID_PASSWORD);
 		}
@@ -56,7 +51,7 @@ public class BoardService {
 	}
 
 	public List<ArticleResDto> findAllArticles() {
-		List<Article> articles = boardRepository.findAll();
+		List<Article> articles = articleRepository.findAll();
 
 		return articles.stream().map(ArticleResDto::from).toList();
 	}
@@ -64,19 +59,19 @@ public class BoardService {
 	@Transactional
 	public void deleteArticleById(long id, PasswordReqDto authDto) {
 
-		Article article = boardRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
+		Article article = articleRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
 
 		if (!article.isEqualPassword(authDto.getPassword())) {
 			throw new GlobalBusinessException(ArticleErrorCode.INVALID_PASSWORD);
 		}
 
-		boardRepository.deleteById(article.getId());
+		articleRepository.deleteById(article.getId());
 	}
 
 	@Transactional
 	public ArticleCommentResDto saveComment(ArticleCommentSaveReqDto reqDto) {
 
-		Article findArticle = boardRepository.findById(reqDto.getArticleId()).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
+		Article findArticle = articleRepository.findById(reqDto.getArticleId()).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
 
 		User findUser = userRepository.findById(reqDto.getUserId()).orElseThrow(() -> new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND));
 

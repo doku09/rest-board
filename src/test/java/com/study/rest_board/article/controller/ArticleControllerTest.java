@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.rest_board.article.dto.reqdto.*;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
-import com.study.rest_board.article.service.BoardService;
+import com.study.rest_board.article.service.ArticleService;
 import com.study.rest_board.common.UserRole;
 import com.study.rest_board.common.jwt.auth.PrincipalDetails;
 import com.study.rest_board.user.domain.User;
-import com.study.rest_board.user.dto.response.UserResDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,15 +33,15 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(BoardController.class)
+@WebMvcTest(ArticleController.class)
 @WithMockUser(username = "user1", roles = "USER")
-class BoardControllerTest {
+class ArticleControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockitoBean
-	private BoardService boardService;
+	private ArticleService articleService;
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -71,7 +70,7 @@ class BoardControllerTest {
 			ArticleResDto.of(1L, "제목1", "내용1", "작성자1"),
 			ArticleResDto.of(2L, "제목2", "내용2", "작성자2")
 		);
-		when(boardService.findAllArticles()).thenReturn(articles);
+		when(articleService.findAllArticles()).thenReturn(articles);
 
 		// When & Then
 		mockMvc.perform(get("/board/articles"))
@@ -88,7 +87,7 @@ class BoardControllerTest {
 		ArticleSaveReqDto requestDto = ArticleSaveReqDto.of("새 글 제목", "새 글 내용", "작성자");
 		ArticleResDto responseDto = ArticleResDto.of(1L, "새 글 제목", "새 글 내용", "작성자");
 
-		when(boardService.saveArticle(any(ArticleSaveReqDto.class))).thenReturn(responseDto);
+		when(articleService.saveArticle(any(ArticleSaveReqDto.class))).thenReturn(responseDto);
 
 		// When & Then
 		mockMvc.perform(post("/board/article")
@@ -107,7 +106,7 @@ class BoardControllerTest {
 		Long articleId = 1L;
 		ArticleResDto responseDto = ArticleResDto.of(articleId, "제목1", "내용1", "작성자1");
 
-		when(boardService.findArticleById(articleId)).thenReturn(responseDto);
+		when(articleService.findArticleById(articleId)).thenReturn(responseDto);
 
 		// When & Then
 		mockMvc.perform(get("/board/article/{id}", articleId))
@@ -124,7 +123,7 @@ class BoardControllerTest {
 		ArticleSaveReqDto requestDto = ArticleSaveReqDto.of("수정된 제목", "수정된 내용", "작성자");
 		ArticleResDto responseDto = ArticleResDto.of(articleId, "수정된 제목", "수정된 내용", "작성자");
 
-		when(boardService.updateArticleById(eq(articleId), any(ArticleUpdateReqDto.class)))
+		when(articleService.updateArticleById(eq(articleId), any(ArticleUpdateReqDto.class)))
 			.thenReturn(responseDto);
 
 		// When & Then
@@ -143,7 +142,7 @@ class BoardControllerTest {
 		Long articleId = 1L;
 		PasswordReqDto passwordDto = new PasswordReqDto("password");
 
-		Mockito.doNothing().when(boardService).deleteArticleById(eq(articleId), any(PasswordReqDto.class));
+		Mockito.doNothing().when(articleService).deleteArticleById(eq(articleId), any(PasswordReqDto.class));
 
 		// When & Then
 		mockMvc.perform(delete("/board/article/{id}", articleId)
@@ -160,7 +159,7 @@ class BoardControllerTest {
 		//given
 		ArticleCommentSaveReqDto reqDto = new ArticleCommentSaveReqDto("댓글 작성하기", 1, 1);
 
-		when(boardService.saveComment(any(ArticleCommentSaveReqDto.class)))
+		when(articleService.saveComment(any(ArticleCommentSaveReqDto.class)))
 			.thenReturn(
 			new ArticleCommentResDto("댓글 작성하기",
 				new ArticleResDto(1, "", "", "", "", ""),
@@ -189,7 +188,7 @@ class BoardControllerTest {
 		ArticleCommentUpdateReqDto updateReqDto = new ArticleCommentUpdateReqDto("댓글 수정", 1, 1);
 		long commentId = 1L;
 		//when
-		when(boardService.updateComment(eq(1L),any(ArticleCommentUpdateReqDto.class))).thenReturn(new ArticleCommentResDto("댓글 수정",null,null));
+		when(articleService.updateComment(eq(1L),any(ArticleCommentUpdateReqDto.class))).thenReturn(new ArticleCommentResDto("댓글 수정",null,null));
 
 	  //then
 		mockMvc.perform(patch("/board/article/comment/" + commentId)
@@ -209,7 +208,7 @@ class BoardControllerTest {
 	  //given
 		long commentId = 1L;
 		long userId = 1L;
-		when(boardService.deleteCommentById(commentId,userId)).thenReturn("delete ok");
+		when(articleService.deleteCommentById(commentId,userId)).thenReturn("delete ok");
 
 	  //when && then
 		mockMvc.perform(
