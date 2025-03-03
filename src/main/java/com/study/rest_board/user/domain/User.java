@@ -7,10 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 @Getter
 @Entity
 @Builder
@@ -20,6 +16,7 @@ import java.util.List;
 public class User {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "user_id")
 	private long id;
 	private String username;
 	private String password;

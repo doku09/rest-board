@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.rest_board.article.dto.reqdto.*;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
+import com.study.rest_board.article.dto.resdto.WriterResDto;
 import com.study.rest_board.article.service.ArticleService;
 import com.study.rest_board.common.UserRole;
+import com.study.rest_board.common.jwt.auth.AuthUserDto;
 import com.study.rest_board.common.jwt.auth.PrincipalDetails;
 import com.study.rest_board.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +57,8 @@ class ArticleControllerTest {
 
 		// SecurityContext에 사용자 설정
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-		securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(
+
+		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
 			principalDetails, null, principalDetails.getAuthorities()
 		));
 
@@ -66,9 +69,13 @@ class ArticleControllerTest {
 	@DisplayName("게시글 전체 목록 조회")
 	void findArticles() throws Exception {
 		// Given
+		WriterResDto writerDto = WriterResDto.builder()
+			.id(1)
+			.name("username").build();
+
 		List<ArticleResDto> articles = Arrays.asList(
-			ArticleResDto.of(1L, "제목1", "내용1", "작성자1"),
-			ArticleResDto.of(2L, "제목2", "내용2", "작성자2")
+			ArticleResDto.of(1L, "제목1", "내용1",writerDto),
+			ArticleResDto.of(2L, "제목2", "내용2",writerDto)
 		);
 		when(articleService.findAllArticles()).thenReturn(articles);
 
@@ -84,13 +91,17 @@ class ArticleControllerTest {
 	@DisplayName("게시글 작성")
 	void saveArticle() throws Exception {
 		// Given
-		ArticleSaveReqDto requestDto = ArticleSaveReqDto.of("새 글 제목", "새 글 내용", "작성자");
-		ArticleResDto responseDto = ArticleResDto.of(1L, "새 글 제목", "새 글 내용", "작성자");
+		ArticleSaveReqDto requestDto = ArticleSaveReqDto.of("새 글 제목", "새 글 내용");
+		WriterResDto writerDto = WriterResDto.builder()
+			.id(1)
+			.name("username").build();
 
-		when(articleService.saveArticle(any(ArticleSaveReqDto.class))).thenReturn(responseDto);
+		ArticleResDto responseDto = ArticleResDto.of(1L, "새 글 제목", "새 글 내용",writerDto);
+
+		when(articleService.saveArticle(any(ArticleSaveReqDto.class),any(AuthUserDto.class))).thenReturn(responseDto);
 
 		// When & Then
-		mockMvc.perform(post("/board/article")
+		mockMvc.perform(post("/article")
 				.contentType(MediaType.APPLICATION_JSON)
 				.with(csrf())
 				.content(objectMapper.writeValueAsString(requestDto)))
@@ -103,13 +114,18 @@ class ArticleControllerTest {
 	@DisplayName("게시글 조회")
 	void findArticleById() throws Exception {
 		// Given
+		WriterResDto writerDto = WriterResDto.builder()
+			.id(1)
+			.name("username").build();
+
 		Long articleId = 1L;
-		ArticleResDto responseDto = ArticleResDto.of(articleId, "제목1", "내용1", "작성자1");
+		ArticleResDto responseDto = ArticleResDto.of(articleId, "제목1", "내용1",writerDto);
 
 		when(articleService.findArticleById(articleId)).thenReturn(responseDto);
 
 		// When & Then
-		mockMvc.perform(get("/board/article/{id}", articleId))
+		mockMvc.perform(get("/board/article/{id}", articleId)
+				.with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.subject").value("제목1"))
 			.andExpect(jsonPath("$.content").value("내용1"));
@@ -119,20 +135,26 @@ class ArticleControllerTest {
 	@DisplayName("게시글 수정")
 	void updateArticleById() throws Exception {
 		// Given
-		Long articleId = 1L;
-		ArticleSaveReqDto requestDto = ArticleSaveReqDto.of("수정된 제목", "수정된 내용", "작성자");
-		ArticleResDto responseDto = ArticleResDto.of(articleId, "수정된 제목", "수정된 내용", "작성자");
+		WriterResDto writerDto = WriterResDto.builder()
+			.id(1)
+			.name("username").build();
 
-		when(articleService.updateArticleById(eq(articleId), any(ArticleUpdateReqDto.class)))
+		Long articleId = 1L;
+		ArticleSaveReqDto requestDto = ArticleSaveReqDto.of("수정된 제목", "수정된 내용");
+
+		ArticleResDto responseDto = ArticleResDto.of(articleId, "수정된 제목", "수정된 내용",writerDto);
+
+		when(articleService.updateArticleById(eq(articleId), any(ArticleUpdateReqDto.class), any(AuthUserDto.class)))
 			.thenReturn(responseDto);
 
 		// When & Then
-		mockMvc.perform(put("/board/article/{id}", articleId)
+		mockMvc.perform(patch("/article/{id}", articleId)
+				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(requestDto)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.subject").value("수정된 제목"))
-			.andExpect(jsonPath("$.content").value("수정된 내용"));
+			.andExpect(jsonPath("$.writer.name").value("username"));
 	}
 
 	@Test
@@ -142,10 +164,11 @@ class ArticleControllerTest {
 		Long articleId = 1L;
 		PasswordReqDto passwordDto = new PasswordReqDto("password");
 
-		Mockito.doNothing().when(articleService).deleteArticleById(eq(articleId), any(PasswordReqDto.class));
+		Mockito.doNothing().when(articleService).deleteArticleById(eq(articleId), any(AuthUserDto.class));
 
 		// When & Then
-		mockMvc.perform(delete("/board/article/{id}", articleId)
+		mockMvc.perform(delete("/article/{id}", articleId)
+				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(passwordDto)))
 			.andExpect(status().isOk())
@@ -158,11 +181,11 @@ class ArticleControllerTest {
 
 		//given
 		ArticleCommentSaveReqDto reqDto = new ArticleCommentSaveReqDto("댓글 작성하기", 1, 1);
-
-		when(articleService.saveComment(any(ArticleCommentSaveReqDto.class)))
+		AuthUserDto writer = AuthUserDto.builder().id(1L).build();
+		when(articleService.saveComment(any(ArticleCommentSaveReqDto.class),writer))
 			.thenReturn(
 			new ArticleCommentResDto("댓글 작성하기",
-				new ArticleResDto(1, "", "", "", "", ""),
+				1L,
 				null
 			)
 		);
@@ -188,7 +211,7 @@ class ArticleControllerTest {
 		ArticleCommentUpdateReqDto updateReqDto = new ArticleCommentUpdateReqDto("댓글 수정", 1, 1);
 		long commentId = 1L;
 		//when
-		when(articleService.updateComment(eq(1L),any(ArticleCommentUpdateReqDto.class))).thenReturn(new ArticleCommentResDto("댓글 수정",null,null));
+		when(articleService.updateComment(eq(1L),any(ArticleCommentUpdateReqDto.class),any(AuthUserDto.class))).thenReturn(new ArticleCommentResDto("댓글 수정",null,null));
 
 	  //then
 		mockMvc.perform(patch("/board/article/comment/" + commentId)
@@ -207,8 +230,8 @@ class ArticleControllerTest {
 		
 	  //given
 		long commentId = 1L;
-		long userId = 1L;
-		when(articleService.deleteCommentById(commentId,userId)).thenReturn("delete ok");
+		AuthUserDto userDto = AuthUserDto.builder().id(1L).build();
+		when(articleService.deleteCommentById(commentId,userDto)).thenReturn("delete ok");
 
 	  //when && then
 		mockMvc.perform(

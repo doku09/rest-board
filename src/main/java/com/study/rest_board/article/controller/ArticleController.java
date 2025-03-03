@@ -4,11 +4,10 @@ import com.study.rest_board.article.dto.reqdto.*;
 import com.study.rest_board.article.dto.resdto.ArticleCommentResDto;
 import com.study.rest_board.article.dto.resdto.ArticleResDto;
 import com.study.rest_board.article.service.ArticleService;
-import com.study.rest_board.common.jwt.auth.PrincipalDetails;
-import com.study.rest_board.user.domain.User;
+import com.study.rest_board.common.resolver.AuthUserInfo;
+import com.study.rest_board.common.jwt.auth.AuthUserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,8 +32,9 @@ public class ArticleController {
 	 * 게시글 작성
 	 */
 	@PostMapping("/article")
-	public ArticleResDto saveArticle(@RequestBody ArticleSaveReqDto reqDto) {
-		return articleService.saveArticle(reqDto);
+	public ArticleResDto saveArticle(@RequestBody ArticleSaveReqDto reqDto,@AuthUserInfo AuthUserDto authUser) {
+
+		return articleService.saveArticle(reqDto,authUser);
 	}
 
 	/**
@@ -48,17 +48,17 @@ public class ArticleController {
 	/**
 	 * 게시글 수정
 	 */
-	@PutMapping("/article/{id}")
-	public ArticleResDto updateArticleById(@PathVariable("id") long id, @RequestBody ArticleUpdateReqDto reqDto) {
-		return articleService.updateArticleById(id,reqDto);
+	@PatchMapping("/article/{id}")
+	public ArticleResDto updateArticleById(@PathVariable("id") long id, @RequestBody ArticleUpdateReqDto reqDto ,@AuthUserInfo AuthUserDto authUser) {
+		return articleService.updateArticleById(id,reqDto,authUser);
 	}
 
 	/**
 	 * 게시글 삭제
 	 */
 	@DeleteMapping("/article/{id}")
-	public String deleteArticleById(@PathVariable("id") long id, @RequestBody PasswordReqDto passwordDto) {
-		articleService.deleteArticleById(id,passwordDto);
+	public String deleteArticleById(@PathVariable("id") long id ,@AuthUserInfo AuthUserDto authUser) {
+		articleService.deleteArticleById(id,authUser);
 		return "ok";
 	}
 
@@ -66,35 +66,25 @@ public class ArticleController {
 	 * 댓글 작성
 	 */
 	@PostMapping("/article/comment")
-	public ArticleCommentResDto saveComment(@RequestBody ArticleCommentSaveReqDto reqDto, @AuthenticationPrincipal PrincipalDetails principal) {
-
-		User user = principal.getUser();
-		reqDto.setUserId(user.getId());
-
-		return articleService.saveComment(reqDto);
+	public ArticleCommentResDto saveComment(@RequestBody ArticleCommentSaveReqDto reqDto, @AuthUserInfo AuthUserDto authUser) {
+		return articleService.saveComment(reqDto,authUser);
 	}
 
 	/**
 	 * 댓글 수정
 	 */
 	@PatchMapping("/article/comment/{id}")
-	public ArticleCommentResDto updateComment(@PathVariable("id") long id, @RequestBody ArticleCommentUpdateReqDto reqDto, @AuthenticationPrincipal PrincipalDetails principal) {
-
-		User user = principal.getUser();
-		reqDto.setUserId(user.getId());
-
-		return articleService.updateComment(id,reqDto);
+	public ArticleCommentResDto updateComment(@PathVariable("id") long id, @RequestBody ArticleCommentUpdateReqDto reqDto, @AuthUserInfo AuthUserDto authUser) {
+		return articleService.updateComment(id,reqDto,authUser);
 	}
 
 	/**
 	 * 댓글 삭제
 	 */
 	@DeleteMapping("/article/comment/{id}")
-	public ResponseEntity<String> deleteComment(@PathVariable("id") long id, @AuthenticationPrincipal PrincipalDetails principal) {
+	public ResponseEntity<String> deleteComment(@PathVariable("id") long id,  @AuthUserInfo AuthUserDto authUser) {
 
-		User user = principal.getUser();
-
-		String result = articleService.deleteCommentById(id, user.getId());
+		String result = articleService.deleteCommentById(id, authUser);
 		return ResponseEntity.ok(result);
 	}
 }

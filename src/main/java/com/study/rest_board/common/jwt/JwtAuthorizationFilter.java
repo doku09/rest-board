@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.study.rest_board.common.exception.GlobalBusinessException;
 import com.study.rest_board.common.jwt.auth.PrincipalDetails;
 import com.study.rest_board.user.domain.User;
-import com.study.rest_board.user.exception.NotFoundUserEntityException;
 import com.study.rest_board.user.exception.UserErrorCode;
 import com.study.rest_board.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -52,6 +51,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			Authentication authentication  = new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
+
 			chain.doFilter(request,response);
 		}
 	}

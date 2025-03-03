@@ -8,7 +8,9 @@ import com.study.rest_board.article.domain.Article;
 import com.study.rest_board.article.exception.ArticleErrorCode;
 import com.study.rest_board.article.repository.ArticleRepository;
 import com.study.rest_board.article.repository.CommentRepository;
+import com.study.rest_board.common.UserRole;
 import com.study.rest_board.common.exception.GlobalBusinessException;
+import com.study.rest_board.common.jwt.auth.AuthUserDto;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.exception.UserErrorCode;
 import com.study.rest_board.user.repository.UserRepository;
@@ -28,8 +30,16 @@ public class ArticleService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public ArticleResDto saveArticle(ArticleSaveReqDto reqDto) {
-		Article savedArticle = articleRepository.save(reqDto.toEntity());
+	public ArticleResDto saveArticle(ArticleSaveReqDto reqDto, AuthUserDto userDto) {
+
+		Article article = reqDto.toEntity();
+
+		User writer = userRepository.findById(userDto.getId()).orElseThrow(() ->new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND));
+
+		article.setWriter(writer);
+
+		Article savedArticle = articleRepository.save(article);
+
 		return ArticleResDto.from(savedArticle);
 	}
 
@@ -39,41 +49,45 @@ public class ArticleService {
 	}
 
 	@Transactional
-	public ArticleResDto updateArticleById(long id, ArticleUpdateReqDto reqDto) {
+	public ArticleResDto updateArticleById(long id, ArticleUpdateReqDto reqDto,AuthUserDto authUser) {
 
 		Article article = articleRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
-		if (!article.isEqualPassword(reqDto.getPassword())) {
-			throw new GlobalBusinessException(ArticleErrorCode.INVALID_PASSWORD);
+
+		if(!(authUser.getRole() == UserRole.ROLE_ADMIN)) {
+			if (!article.isSameWriter(authUser.getId())) {
+				throw new GlobalBusinessException(ArticleErrorCode.INVALID_WRITER);
+			}
 		}
 
-		article.update(reqDto);
+		article.update(reqDto.getSubject(),reqDto.getContent());
 		return ArticleResDto.from(article);
 	}
 
 	public List<ArticleResDto> findAllArticles() {
-		List<Article> articles = articleRepository.findAll();
-
+		List<Article> articles = articleRepository.findAllArticleWithComment();
 		return articles.stream().map(ArticleResDto::from).toList();
 	}
 
 	@Transactional
-	public void deleteArticleById(long id, PasswordReqDto authDto) {
+	public void deleteArticleById(long id, AuthUserDto authUser) {
 
 		Article article = articleRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
 
-		if (!article.isEqualPassword(authDto.getPassword())) {
-			throw new GlobalBusinessException(ArticleErrorCode.INVALID_PASSWORD);
+		if(!(authUser.getRole() == UserRole.ROLE_ADMIN)) {
+			if (!article.isSameWriter(authUser.getId())) {
+				throw new GlobalBusinessException(ArticleErrorCode.INVALID_WRITER);
+			}
 		}
 
 		articleRepository.deleteById(article.getId());
 	}
 
 	@Transactional
-	public ArticleCommentResDto saveComment(ArticleCommentSaveReqDto reqDto) {
+	public ArticleCommentResDto saveComment(ArticleCommentSaveReqDto reqDto,AuthUserDto userDto) {
 
 		Article findArticle = articleRepository.findById(reqDto.getArticleId()).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.ARTICLE_NOT_FOUND));
 
-		User findUser = userRepository.findById(reqDto.getUserId()).orElseThrow(() -> new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND));
+		User findUser = userRepository.findById(userDto.getId()).orElseThrow(() -> new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND));
 
 		ArticleComment beforeSaveComment = reqDto.toEntity(findArticle, findUser);
 
@@ -83,12 +97,14 @@ public class ArticleService {
 	}
 
 	@Transactional
-	public ArticleCommentResDto updateComment(long id,ArticleCommentUpdateReqDto reqDto) {
+	public ArticleCommentResDto updateComment(long id,ArticleCommentUpdateReqDto reqDto,AuthUserDto authUser) {
 
 		ArticleComment findComment = commentRepository.findById(id).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.COMMENT_NOT_FOUND));
 
-		if(!findComment.isSameWriter(reqDto.getUserId())) {
-			throw new GlobalBusinessException(ArticleErrorCode.INVALID_WRITER);
+		if(!(authUser.getRole() == UserRole.ROLE_ADMIN)) {
+			if (!findComment.isSameWriter(authUser.getId())) {
+				throw new GlobalBusinessException(ArticleErrorCode.INVALID_WRITER);
+			}
 		}
 
 		findComment.updateComment(reqDto.getContent());
@@ -97,12 +113,14 @@ public class ArticleService {
 	}
 
 	@Transactional
-	public String deleteCommentById(long commentId, long userId) {
+	public String deleteCommentById(long commentId, AuthUserDto authUser) {
 
 		ArticleComment findComment = commentRepository.findById(commentId).orElseThrow(() -> new GlobalBusinessException(ArticleErrorCode.COMMENT_NOT_FOUND));
 
-		if(!findComment.isSameWriter(userId)) {
-			throw new GlobalBusinessException(ArticleErrorCode.INVALID_WRITER);
+		if(!(authUser.getRole() == UserRole.ROLE_ADMIN)) {
+			if (!findComment.isSameWriter(authUser.getId())) {
+				throw new GlobalBusinessException(ArticleErrorCode.INVALID_WRITER);
+			}
 		}
 
 		commentRepository.deleteById(commentId);

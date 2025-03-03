@@ -13,23 +13,19 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ArticleCommentResDto {
 	private String content;
-	private ArticleResDto article;
+	private Long articleId;
 	private UserResDto user;
 
 	public static ArticleCommentResDto from(ArticleComment entity) {
-		ArticleResDto articleResDto = null;
 		UserResDto userDto = null;
-
-		if(null != entity.getArticle()) {
-			articleResDto = ArticleResDto.from(entity.getArticle());
-		}
 
 		if(null != entity.getUser()) {
 			userDto = UserResDto.from(entity.getUser());
 		}
+
 		return ArticleCommentResDto.builder()
 			.content(entity.getContent())
-			.article(articleResDto)
+			.articleId(entity.getArticle().getId())
 			.user(userDto)
 			.build();
 	}

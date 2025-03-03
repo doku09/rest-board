@@ -1,9 +1,10 @@
 package com.study.rest_board.user.service;
 
 import com.study.rest_board.common.UserRole;
+import com.study.rest_board.common.exception.GlobalBusinessException;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.dto.request.UserJoinRequestDto;
-import com.study.rest_board.user.exception.UsernameAlreadyExistsException;
+import com.study.rest_board.user.exception.UserErrorCode;
 import com.study.rest_board.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,7 +26,7 @@ public class UserService {
 	public void join(UserJoinRequestDto userDto) {
 
 		if(userRepository.findByUsername(userDto.getUsername()).isPresent()) {
-			throw new UsernameAlreadyExistsException("이미 존재하는 사용자입니다.");
+			throw new GlobalBusinessException(UserErrorCode.USER_ALREADY_EXIST);
 		}
 
 		if(null == userDto.getRole()){

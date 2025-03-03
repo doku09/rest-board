@@ -32,17 +32,28 @@ public class DataInit {
 	@PostConstruct
 	void dataInit() {
 
-		//회원
-		User user1 = new UserJoinRequestDto("user", "abc1234!", UserRole.ROLE_USER).toEntity();
-		User user2 = new UserJoinRequestDto("admin", "abc1234!", UserRole.ROLE_ADMIN).toEntity();
+		// 회원
+		User user1 = new UserJoinRequestDto("user", "$2a$10$lWu7H7WadF2dhL3hYnlFYOva50t4VigtJsU4OvIfnbc.fqLFq5J4O", UserRole.ROLE_USER).toEntity();
+		User user2 = new UserJoinRequestDto("admin", "$2a$10$lWu7H7WadF2dhL3hYnlFYOva50t4VigtJsU4OvIfnbc.fqLFq5J4O", UserRole.ROLE_ADMIN).toEntity();//abc1234!
 
 		userRepository.save(user1);
 		userRepository.save(user2);
 
+
 		// 게시글
-		Article article1 = new ArticleSaveReqDto("[인터뷰] 기아 PBV에 삼성 끼어든 이유… 新시장 개척", "내용", "dong", fixedDate, "aaa1234").toEntity();
-		Article article2 = new ArticleSaveReqDto("고준위법 국회 통과했지만…부지 선정·주민 반대 ", "내용", "dong", fixedDate, "aaa1234").toEntity();
-		Article article3 = new ArticleSaveReqDto("안 그래도 바늘구멍인데…1억 미만 가계대출도 소득 따진다", "내용", "dong", fixedDate, "aaa1234").toEntity();
+		Article article1 = new ArticleSaveReqDto("[인터뷰] 기아 PBV에 삼성 끼어든 이유… 新시장 개척", "내용", fixedDate).toEntity();
+		Article article2 = new ArticleSaveReqDto("고준위법 국회 통과했지만…부지 선정·주민 반대 ", "내용", fixedDate).toEntity();
+		Article article3 = new ArticleSaveReqDto("안 그래도 바늘구멍인데…1억 미만 가계대출도 소득 따진다", "내용", fixedDate).toEntity();
+
+		article1.setWriter(User.builder()
+			.id(1L)
+			.build());
+		article2.setWriter(User.builder()
+			.id(2L)
+			.build());
+		article3.setWriter(User.builder()
+			.id(1L)
+			.build());
 
 
 		// 댓글

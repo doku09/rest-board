@@ -6,7 +6,7 @@ import com.study.rest_board.user.JwtUtil;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.dto.request.UserJoinRequestDto;
 import com.study.rest_board.user.dto.request.UserLoginRequestDto;
-import com.study.rest_board.user.repository.UserRepositoryJPA;
+import com.study.rest_board.user.repository.UserRepository;
 import com.study.rest_board.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -47,7 +46,7 @@ class UserControllerTest {
 	private UserService userService;
 
 	@Mock
-	private UserRepositoryJPA userRepository;
+	private UserRepository userRepository;
 
 	@Autowired
 	private ObjectMapper objectMapper;

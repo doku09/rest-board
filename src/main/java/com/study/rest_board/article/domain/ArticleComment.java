@@ -33,5 +33,7 @@ public class ArticleComment {
 	public void updateComment(String content) {
 		this.content = content;
 	}
-
+	public void associateWithArticle(Article article) {
+		this.article = article;
+	}
 }

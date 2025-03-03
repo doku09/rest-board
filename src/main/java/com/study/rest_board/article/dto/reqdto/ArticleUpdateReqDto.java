@@ -16,15 +16,12 @@ public class ArticleUpdateReqDto {
 	private long id;
 	private String subject;
 	private String content;
-	private String writerName;
 	private LocalDateTime regDt;
-	private String password;
 
 	public static ArticleUpdateReqDto of(String subject, String content, String password) {
 		return ArticleUpdateReqDto.builder()
 			.subject(subject)
 			.content(content)
-			.password(password)
 			.build();
 	}
 
@@ -32,8 +29,6 @@ public class ArticleUpdateReqDto {
 		return Article.builder()
 			.subject(this.subject)
 			.content(this.content)
-			.writerName(this.writerName)
-			.password(this.password)
 			.regDt(LocalDateTime.now())
 			.build();
 	}

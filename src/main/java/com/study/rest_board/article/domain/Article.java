@@ -1,42 +1,53 @@
 package com.study.rest_board.article.domain;
 
-import com.study.rest_board.article.dto.reqdto.ArticleSaveReqDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.study.rest_board.user.domain.User;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Getter
 @Entity
 public class Article {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "article_id")
 	private long id;
 	private String subject;
 	private String content;
-	private String writerName;
 	private LocalDateTime regDt;
-	private String password;
 
+	@Setter
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User writer;
 
-	public void update(ArticleSaveReqDto reqDto) {
-		this.subject = reqDto.getSubject();
-		this.content = reqDto.getContent();
-		this.writerName = reqDto.getWriterName();
-		this.password = reqDto.getPassword();
+	@OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+	private List<ArticleComment> comments =new ArrayList<>();
+
+	@Builder
+	public Article(long id, String subject, String content, LocalDateTime regDt) {
+		this.id = id;
+		this.subject = subject;
+		this.content = content;
+		this.regDt = regDt;
 	}
 
-	public boolean isEqualPassword(String password) {
-		return this.password.equals(password);
+	public void update(String subject,String content) {
+		this.subject = subject;
+		this.content = content;
+	}
+
+	public void addComment(ArticleComment comment) {
+		this.comments.add(comment);
+		comment.associateWithArticle(this);
+	}
+
+	public boolean isSameWriter(long userId) {
+		return this.getWriter().getId() == userId;
 	}
 }

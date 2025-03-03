@@ -15,15 +15,12 @@ import java.time.LocalDateTime;
 public class ArticleSaveReqDto {
 	private String subject;
 	private String content;
-	private String writerName;
 	private LocalDateTime regDt;
-	private String password;
 
-	public static ArticleSaveReqDto of(String subject, String content, String password) {
+	public static ArticleSaveReqDto of(String subject, String content) {
 		return ArticleSaveReqDto.builder()
 			.subject(subject)
 			.content(content)
-			.password(password)
 			.build();
 	}
 
@@ -31,8 +28,6 @@ public class ArticleSaveReqDto {
 		return Article.builder()
 			.subject(this.subject)
 			.content(this.content)
-			.writerName(this.writerName)
-			.password(this.password)
 			.regDt(LocalDateTime.now())
 			.build();
 	}

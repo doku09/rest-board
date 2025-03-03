@@ -104,7 +104,7 @@ class ArticleRepositoryTest {
 		ArticleCommentSaveReqDto reqDto = new ArticleCommentSaveReqDto("comment", 1L, 1L);
 
 		User savedUser = userRepository.save(UserJoinRequestDto.builder().username("").build().toEntity());
-		Article savedArticle = articleRepository.save(ArticleSaveReqDto.of("subejc","","").toEntity());
+		Article savedArticle = articleRepository.save(ArticleSaveReqDto.of("subejc","").toEntity());
 
 		//when
 		ArticleComment comment = reqDto.toEntity(savedArticle, savedUser);
