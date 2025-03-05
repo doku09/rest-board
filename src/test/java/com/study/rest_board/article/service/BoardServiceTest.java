@@ -233,8 +233,8 @@ ArticleServiceTest {
 	}
 	
 	@Test
-	@DisplayName("작성한 게시글을 수정한다")
-	void 게시글_수정_정상() {
+	@DisplayName("작성한 댓글을 수정한다")
+	void 댓글_수정_정상() {
 
 	  //given
 		long commentId = 1L;
@@ -252,6 +252,54 @@ ArticleServiceTest {
 
 		//when
 		ArticleCommentResDto updatedComment = articleService.updateComment(commentId, updateReqDto,AuthUserDto.builder().id(1L).build());
+
+		//then
+		assertThat(updateReqDto.getContent()).isEqualTo(updatedComment.getContent());
+	}
+
+	@Test
+	@DisplayName("내가 작성하지 않은 댓글을 수정한다.")
+	void 댓글_수정_작성자_불일치() {
+
+		//given
+		long commentId = 1L;
+
+		ArticleCommentUpdateReqDto updateReqDto = new ArticleCommentUpdateReqDto("updateContent", 1, 1);
+
+		User findUser = new User(1L, "", "", null);
+
+		Article findArticle = new Article(1L, "", "", LocalDateTime.now());
+
+		ArticleComment savedComment = new ArticleComment(commentId, "originalContent", findUser, findArticle);
+
+		when(commentRepository.findById(commentId))
+			.thenReturn(Optional.of(savedComment));
+
+		//then
+		assertThatThrownBy(() -> articleService.updateComment(commentId, updateReqDto,UserSteps.일반권한유저_생성(2L)))
+			.isInstanceOf(GlobalBusinessException.class);
+	}
+
+	@Test
+	@DisplayName("관리자는 모든 댓글을 수정한다.")
+	void 댓글_수정_관리자() {
+
+		//given
+		long commentId = 1L;
+
+		ArticleCommentUpdateReqDto updateReqDto = new ArticleCommentUpdateReqDto("updateContent", 1, 1);
+
+		User findUser = new User(1L, "", "", null);
+
+		Article findArticle = new Article(1L, "", "", LocalDateTime.now());
+
+		ArticleComment savedComment = new ArticleComment(commentId, "originalContent", findUser, findArticle);
+
+		when(commentRepository.findById(commentId))
+			.thenReturn(Optional.of(savedComment));
+
+		//when
+		ArticleCommentResDto updatedComment = articleService.updateComment(commentId, updateReqDto,UserSteps.관리자_권한_유저());
 
 		//then
 		assertThat(updateReqDto.getContent()).isEqualTo(updatedComment.getContent());

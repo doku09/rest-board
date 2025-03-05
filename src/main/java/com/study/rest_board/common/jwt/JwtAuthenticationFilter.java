@@ -1,16 +1,18 @@
 package com.study.rest_board.common.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.rest_board.common.jwt.auth.PrincipalDetails;
+import com.study.rest_board.common.jwt.refresh.RefreshToken;
+import com.study.rest_board.common.jwt.refresh.RefreshTokenRepository;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.dto.response.UserResDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,27 +20,27 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-	private final AuthenticationManager authenticationManager;
+	ObjectMapper objectMapper = new ObjectMapper();
 
+	private final AuthenticationManager authenticationManager;
+	private final JwtUtil jwtUtil;
+	private final RefreshTokenRepository refreshRepository;
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			User user = objectMapper.readValue(request.getInputStream(), User.class);
+			LoginDto user = objectMapper.readValue(request.getInputStream(), LoginDto.class);
+
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 
-			// PrincipalDetailsService의 loadUserByUsername() 함수가 실행된 후 정상이면 authentication이 리턴됨.
-			// DB에 있는  username과 password가 일치한다.
-			Authentication authenticate = authenticationManager.authenticate(authenticationToken);
-
-			return authenticate;
+			return authenticationManager.authenticate(authenticationToken);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -50,15 +52,40 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
-		JwtTokenProvider jwtProvider = new JwtTokenProvider();
-		String jwtToken = jwtProvider.generateToken(principalDetails);
+		String username = principalDetails.getUser().getUsername();
+		String role = principalDetails.getUser().getRole().name();
 
-		ObjectMapper objectMapper = new ObjectMapper();
+		String accessToken = jwtUtil.createJwt("access", username, role, 1);
+		String refreshToken = jwtUtil.createJwt("refresh", username, role, 12*60);
 
-		//유저정보 반환
-		response.addHeader(JwtProperties.HEADER_STRING,JwtProperties.TOKEN_PREFIX+jwtToken);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(objectMapper.writeValueAsString(UserResDto.from(principalDetails.getUser())));
+		String userDto = objectMapper.writeValueAsString(UserResDto.from(principalDetails.getUser()));
+
+		addRefresh(username,refreshToken, 12 * 60);
+
+
+		response.getWriter().write(userDto);
+		response.setHeader("access", accessToken);
+		response.addCookie(createCookie("refresh", refreshToken));
+		response.setStatus(HttpStatus.OK.value());
+	}
+
+	protected void addRefresh(String username, String refresh, int expiredMinute) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MINUTE, expiredMinute);
+		Date date = calendar.getTime();
+
+		RefreshToken refreshEntity = new RefreshToken();
+		refreshEntity.setUsername(username);
+		refreshEntity.setRefresh(refresh);
+		refreshEntity.setExpiration(date.toString());
+
+		refreshRepository.save(refreshEntity);
+	}
+
+	Cookie createCookie(String key, String value){
+		Cookie cookie = new Cookie(key, value);
+		cookie.setMaxAge(12*60*60); // 12h
+		cookie.setHttpOnly(true);   //JS로 접근 불가, 탈취 위험 감소
+		return cookie;
 	}
 }

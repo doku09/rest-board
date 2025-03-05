@@ -24,6 +24,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
 		boolean hasAuthUserAnnotation = parameter.hasParameterAnnotation(AuthUserInfo.class);
 
+		// 예외처리
 		boolean hasAuthUserType = AuthUserDto.class.isAssignableFrom(parameter.getParameterType());
 
 		return hasAuthUserAnnotation && hasAuthUserType;

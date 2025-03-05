@@ -2,10 +2,7 @@ package com.study.rest_board.user.domain;
 
 import com.study.rest_board.common.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Entity
@@ -18,9 +15,20 @@ public class User {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
 	private long id;
+	@Setter
 	private String username;
 	private String password;
 
 	@Enumerated(EnumType.STRING)
 	private UserRole role; //USER,ADMIN
+
+	public void setRole(String role) {
+
+		UserRole userRole = UserRole.ROLE_USER;
+
+		if(role.equals("ADMIN")) {
+			userRole = UserRole.ROLE_ADMIN;
+		}
+		this.role = userRole;
+	}
 }

@@ -11,10 +11,14 @@ import java.util.Collection;
 @Getter
 public class PrincipalDetails implements UserDetails {
 
-	private User user;
+	private final User user;
 
 	public PrincipalDetails(User user) {
 		this.user = user;
+	}
+
+	public PrincipalDetails() {
+		this.user = new User();
 	}
 
 	@Override

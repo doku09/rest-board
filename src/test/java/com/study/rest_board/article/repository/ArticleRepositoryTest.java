@@ -11,6 +11,7 @@ import com.study.rest_board.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+//@DataJpaTest
 @ActiveProfiles("test")
 class ArticleRepositoryTest {
 
@@ -69,7 +71,6 @@ class ArticleRepositoryTest {
 
 		//when
 		findComment.get().updateComment(upateComment.getContent());
-//		commentRepository.flush();
 
 		//then
 		Optional<ArticleComment> updatedComment = commentRepository.findById(findComment.get().getId());
@@ -91,7 +92,7 @@ class ArticleRepositoryTest {
 
 		//when
 		commentRepository.deleteById(savedComment.getId());
-//		boardRepository.flush();
+		commentRepository.flush();
 
 	  //then
 		Optional<ArticleComment> deletedComment = commentRepository.findById(savedComment.getId());
