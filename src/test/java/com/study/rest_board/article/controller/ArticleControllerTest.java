@@ -8,7 +8,7 @@ import com.study.rest_board.article.dto.resdto.WriterResDto;
 import com.study.rest_board.article.service.ArticleService;
 import com.study.rest_board.common.UserRole;
 import com.study.rest_board.common.jwt.auth.AuthUserDto;
-import com.study.rest_board.common.jwt.auth.PrincipalDetails;
+import com.study.rest_board.common.jwt.auth.CustomUserDetails;
 import com.study.rest_board.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,18 +48,18 @@ class ArticleControllerTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	private PrincipalDetails principalDetails;
+	private CustomUserDetails customUserDetails;
 
 	@BeforeEach
 	void createUser() {
 		User user = new User(1, "username", "abc123!", UserRole.ROLE_USER);
-		principalDetails = new PrincipalDetails(user);
+		customUserDetails = new CustomUserDetails(user);
 
 		// SecurityContext에 사용자 설정
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
 		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-			principalDetails, null, principalDetails.getAuthorities()
+			customUserDetails, null, customUserDetails.getAuthorities()
 		));
 
 		SecurityContextHolder.setContext(securityContext);
@@ -195,7 +195,7 @@ class ArticleControllerTest {
 				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(reqDto))
-				.with(SecurityMockMvcRequestPostProcessors.user(principalDetails))
+				.with(SecurityMockMvcRequestPostProcessors.user(customUserDetails))
 			)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.content").value("댓글 작성하기"))
@@ -218,7 +218,7 @@ class ArticleControllerTest {
 			.with(csrf())
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(updateReqDto))
-			.with(SecurityMockMvcRequestPostProcessors.user(principalDetails))
+			.with(SecurityMockMvcRequestPostProcessors.user(customUserDetails))
 		)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.content").value("댓글 수정"));
@@ -237,7 +237,7 @@ class ArticleControllerTest {
 		mockMvc.perform(
 			delete("/board/article/comment/" + commentId)
 				.with(csrf())
-				.with(SecurityMockMvcRequestPostProcessors.user(principalDetails))
+				.with(SecurityMockMvcRequestPostProcessors.user(customUserDetails))
 		)
 			.andExpect(status().isOk())
 			.andExpect(content().string("delete ok"));

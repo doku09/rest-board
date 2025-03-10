@@ -1,6 +1,6 @@
 package com.study.rest_board.common.jwt.refresh;
 
-import com.study.rest_board.common.jwt.JwtUtil;
+import com.study.rest_board.common.jwt.JWTUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class ReissueController {
 
-	private final JwtUtil jwtUtil;
+	private final JWTUtil jwtUtil;
 	private final RefreshTokenRepository refreshRepository;
 
 	@PostMapping("/reissue")
@@ -47,8 +47,8 @@ public class ReissueController {
 		// crete new access token
 		String username = jwtUtil.getUsername(refresh);
 		String role = jwtUtil.getRole(refresh);
-		String newAccess = jwtUtil.createJwt("access", username, role, 10);
-		String newRefresh = jwtUtil.createJwt("refresh", username, role, 12*60);
+		String newAccess = jwtUtil.createJwt( username, role, 10);
+		String newRefresh = jwtUtil.createJwt(username, role, 12*60);
 
 		// rotate refresh
 		refreshRepository.deleteByRefresh(refresh);

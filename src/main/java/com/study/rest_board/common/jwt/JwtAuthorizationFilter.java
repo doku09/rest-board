@@ -3,7 +3,7 @@ package com.study.rest_board.common.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.study.rest_board.common.exception.GlobalBusinessException;
-import com.study.rest_board.common.jwt.auth.PrincipalDetails;
+import com.study.rest_board.common.jwt.auth.CustomUserDetails;
 import com.study.rest_board.user.domain.User;
 import com.study.rest_board.user.exception.UserErrorCode;
 import com.study.rest_board.user.repository.UserRepository;
@@ -45,10 +45,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		// 서명이 정상적으로 됨
 		if(null != username) {
 			User user = userRepository.findByUsername(username).orElseThrow(() -> new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND));
-			PrincipalDetails principalDetails = new PrincipalDetails(user);
+			CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
 			// 강제로 인증 객체 생성
-			Authentication authentication  = new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
+			Authentication authentication  = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 

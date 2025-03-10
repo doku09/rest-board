@@ -9,23 +9,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Getter
-public class PrincipalDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
 	private final User user;
 
-	public PrincipalDetails(User user) {
+	public CustomUserDetails(User user) {
 		this.user = user;
-	}
-
-	public PrincipalDetails() {
-		this.user = new User();
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Collection<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(() -> user.getRole().name());
-		return authorities;
+
+		Collection<GrantedAuthority> collection = new ArrayList<>();
+
+		collection.add(new GrantedAuthority() {
+			@Override
+			public String getAuthority() {
+				return user.getRole().name();
+			}
+		});
+
+		return collection;
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PrincipalDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 
@@ -21,6 +21,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username).orElseThrow(() -> new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND));
-		return new PrincipalDetails(user);
+
+		return new CustomUserDetails(user);
 	}
 }

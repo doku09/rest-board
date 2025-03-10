@@ -1,13 +1,12 @@
 package com.study.rest_board.common.config;
 
-import com.study.rest_board.common.jwt.JwtAuthenticationFilter;
+import com.study.rest_board.common.jwt.LoginFilter;
 //import com.study.rest_board.common.jwt.JwtAuthorizationFilter;
-import com.study.rest_board.common.jwt.JwtUtil;
-import com.study.rest_board.common.jwt.JwtVerificationFilter;
+import com.study.rest_board.common.jwt.JWTUtil;
+import com.study.rest_board.common.jwt.JWTFilter;
 import com.study.rest_board.common.jwt.refresh.RefreshTokenRepository;
 import com.study.rest_board.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,13 +16,14 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
 	private final UserRepository userRepository;
-	private final JwtUtil jwtUtil;
+	private final JWTUtil jwtUtil;
 	private final RefreshTokenRepository refreshTokenRepository;
 
 	@Bean
@@ -38,12 +38,11 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain configure(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+	public SecurityFilterChain configure(HttpSecurity http, AuthenticationManager authenticationManager, AuthenticationConfiguration authenticationConfiguration) throws Exception {
 
-		JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager,jwtUtil,refreshTokenRepository);
+		LoginFilter loginFilter = new LoginFilter(authenticationManager,jwtUtil);
 		
-		JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtUtil);
-		jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+		loginFilter.setFilterProcessesUrl("/auth/login");
 
 		http
 			.formLogin(AbstractHttpConfigurer::disable)
@@ -56,8 +55,8 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		http
-			.addFilter(jwtAuthenticationFilter)
-			.addFilterAfter(jwtVerificationFilter,JwtAuthenticationFilter.class);
+			.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
+			.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
 		http
 			.authorizeHttpRequests((authz) -> authz

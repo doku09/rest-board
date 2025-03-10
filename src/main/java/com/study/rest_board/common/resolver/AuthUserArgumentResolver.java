@@ -2,7 +2,7 @@ package com.study.rest_board.common.resolver;
 
 import com.study.rest_board.common.exception.GlobalBusinessException;
 import com.study.rest_board.common.jwt.auth.AuthUserDto;
-import com.study.rest_board.common.jwt.auth.PrincipalDetails;
+import com.study.rest_board.common.jwt.auth.CustomUserDetails;
 import com.study.rest_board.user.exception.UserErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -41,8 +41,8 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 			throw new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND);
 		}
 
-		PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-		return AuthUserDto.from(principalDetails.getUser());
+		return AuthUserDto.from(customUserDetails.getUser());
 	}
 }
