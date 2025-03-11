@@ -4,7 +4,7 @@ import com.study.rest_board.common.jwt.LoginFilter;
 //import com.study.rest_board.common.jwt.JwtAuthorizationFilter;
 import com.study.rest_board.common.jwt.JWTUtil;
 import com.study.rest_board.common.jwt.JWTFilter;
-import com.study.rest_board.common.jwt.refresh.RefreshTokenRepository;
+import com.study.rest_board.common.jwt.refresh.RefreshRepository;
 import com.study.rest_board.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +24,7 @@ public class SecurityConfig {
 
 	private final UserRepository userRepository;
 	private final JWTUtil jwtUtil;
-	private final RefreshTokenRepository refreshTokenRepository;
+	private final RefreshRepository refreshRepository;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -40,7 +40,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain configure(HttpSecurity http, AuthenticationManager authenticationManager, AuthenticationConfiguration authenticationConfiguration) throws Exception {
 
-		LoginFilter loginFilter = new LoginFilter(authenticationManager,jwtUtil);
+		LoginFilter loginFilter = new LoginFilter(authenticationManager,jwtUtil,refreshRepository);
 		
 		loginFilter.setFilterProcessesUrl("/auth/login");
 
@@ -62,6 +62,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests((authz) -> authz
 				.requestMatchers("/articles").authenticated()
 //				.requestMatchers("/admin").hasRole("ADMIN")
+				.requestMatchers("/reissue").permitAll()
 				.anyRequest().permitAll());
 
 

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+// JWT 발급 및 검증하는 유틸
 @Component
 public class JWTUtil {
 
@@ -22,13 +23,20 @@ public class JWTUtil {
 		System.out.println("secretKey = " + secretKey);
 	}
 
-	// 토큰 생성
-	public String createJwt(String username, String role, int expiredMinute){
+	/**
+	 *
+	 * @param category access인지 refresh인지
+	 * @param username
+	 * @param role
+	 * @param expiredMinute
+	 * @return
+	 */
+	public String createJwt(String category, String username, String role, long expiredMinute){
 
 		return Jwts.builder()
+			.claim("category",category)
 			.claim("username", username)
 			.claim("role", role)
-//			.claim("category",category)
 			.issuedAt(new Date(System.currentTimeMillis())) //현재 발행시간
 			.expiration(new Date(System.currentTimeMillis() + expiredMinute))
 			.signWith(secretKey) // 암호화

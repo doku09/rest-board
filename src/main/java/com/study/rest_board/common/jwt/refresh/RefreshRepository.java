@@ -3,7 +3,7 @@ package com.study.rest_board.common.jwt.refresh;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken,Long> {
+public interface RefreshRepository extends JpaRepository<RefreshEntity,Long> {
 
 	Boolean existsByRefresh(String refresh);
 
