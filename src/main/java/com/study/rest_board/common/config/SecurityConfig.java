@@ -55,13 +55,13 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable);
 
 		http
-			.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class)
+			.addFilterBefore(new JWTFilter(jwtUtil,userRepository), LoginFilter.class)
 			.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
 		http
 			.authorizeHttpRequests((authz) -> authz
-				.requestMatchers("/board/**").authenticated()
-				.requestMatchers("/admin/article/**").hasAnyRole("ADMIN")
+				.requestMatchers("/articles").authenticated()
+//				.requestMatchers("/admin").hasRole("ADMIN")
 				.anyRequest().permitAll());
 
 

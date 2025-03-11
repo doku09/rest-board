@@ -1,7 +1,10 @@
 package com.study.rest_board.common.jwt;
 
+import com.study.rest_board.common.exception.GlobalBusinessException;
 import com.study.rest_board.common.jwt.auth.CustomUserDetails;
 import com.study.rest_board.user.domain.User;
+import com.study.rest_board.user.exception.UserErrorCode;
+import com.study.rest_board.user.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,6 +22,7 @@ import java.io.IOException;
 public class JWTFilter extends OncePerRequestFilter {
 
 	private final JWTUtil jwtUtil;
+	private final UserRepository userRepository;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,13 +51,11 @@ public class JWTFilter extends OncePerRequestFilter {
 		String username = jwtUtil.getUsername(token);
 		String role = jwtUtil.getRole(token);
 
-		//userEntity를 생성하여 값 set
-		User userEntity = new User();
-		userEntity.setUsername(username);
-		userEntity.setRole(role);
+		//user를 생성하여 값 set
+		User findUser = userRepository.findByUsername(username).orElseThrow(() -> new GlobalBusinessException(UserErrorCode.USER_NOT_FOUND));
 
 		//UserDetails에 회원 정보 객체 담기
-		CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
+		CustomUserDetails customUserDetails = new CustomUserDetails(findUser);
 
 		//스프링 시큐리티 인증 토큰 생성
 		Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

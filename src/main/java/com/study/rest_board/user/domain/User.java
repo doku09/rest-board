@@ -26,7 +26,7 @@ public class User {
 
 		UserRole userRole = UserRole.ROLE_USER;
 
-		if(role.equals("ADMIN")) {
+		if(role.equals(UserRole.ROLE_ADMIN.name())) {
 			userRole = UserRole.ROLE_ADMIN;
 		}
 		this.role = userRole;
