@@ -4,6 +4,7 @@ import com.study.rest_board.common.jwt.LoginFilter;
 //import com.study.rest_board.common.jwt.JwtAuthorizationFilter;
 import com.study.rest_board.common.jwt.JWTUtil;
 import com.study.rest_board.common.jwt.JWTFilter;
+import com.study.rest_board.common.jwt.auth.CustomLogoutFilter;
 import com.study.rest_board.common.jwt.refresh.RefreshRepository;
 import com.study.rest_board.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,7 +32,6 @@ public class SecurityConfig {
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -56,7 +57,9 @@ public class SecurityConfig {
 
 		http
 			.addFilterBefore(new JWTFilter(jwtUtil,userRepository), LoginFilter.class)
-			.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+			.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new CustomLogoutFilter(jwtUtil,refreshRepository), LogoutFilter.class)
+		;
 
 		http
 			.authorizeHttpRequests((authz) -> authz

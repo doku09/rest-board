@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Calendar;
 import java.util.Date;
 
 @RestController
@@ -80,7 +79,7 @@ public class ReissueController {
 
 		//Refresh 토큰 저장 DB에 기존의 Refresh 토큰 삭제 후 새 Refresh 토큰 저장
 		refreshRepository.deleteByRefresh(refresh);
-		addRefresh(username, newRefresh,JwtProperties.REFRESH_TOKEN_TIME);
+		addRefresh(username, newRefresh);
 
 		//response
 		response.setHeader("access", newAccess);
@@ -90,9 +89,9 @@ public class ReissueController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	private void addRefresh(String username, String refresh, Long expiredMs) {
+	private void addRefresh(String username, String refresh) {
 
-		Date date = new Date(System.currentTimeMillis() + expiredMs);
+		Date date = new Date(System.currentTimeMillis() + JwtProperties.REFRESH_TOKEN_TIME);
 
 		RefreshEntity refreshEntity = new RefreshEntity();
 		refreshEntity.setUsername(username);
